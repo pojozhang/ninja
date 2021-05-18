@@ -3,6 +3,7 @@ import hmac
 import json
 from datetime import datetime
 from hashlib import sha256
+from ratelimit import limits, sleep_and_retry
 
 import requests
 
@@ -15,14 +16,20 @@ class Client:
         self.rest = config["rest"]
         self.env = config["env"]
 
+    @sleep_and_retry
+    @limits(calls=10, period=1)
     def instruments(self, inst_type="SWAP"):
         data = self.send_request("/api/v5/public/instruments", params={"instType": inst_type})
         return data
 
+    @sleep_and_retry
+    @limits(calls=10, period=1)
     def ticker(self, inst_id):
         data = self.send_request("/api/v5/market/ticker", params={"instId": inst_id})
         return data[0]
 
+    @sleep_and_retry
+    @limits(calls=10, period=1)
     def candles(self, inst_id, before="", after="", bar="15m", limit=""):
         data = self.send_request("/api/v5/market/candles",
                                  params={"instId": inst_id, "before": before,
@@ -30,10 +37,14 @@ class Client:
                                          "limit": limit})
         return data
 
+    @sleep_and_retry
+    @limits(calls=10, period=2)
     def account_balance(self, ccy=''):
         data = self.send_request("/api/v5/account/balance")
         return data
 
+    @sleep_and_retry
+    @limits(calls=10, period=2)
     def time(self):
         data = self.send_request("/api/v5/public/time")
         return data[0]['ts']

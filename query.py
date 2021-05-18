@@ -1,5 +1,7 @@
 import argparse
 import configparser
+import logging.config
+
 import okex
 from utils import print_json
 
@@ -19,6 +21,8 @@ def query_ticker(args):
 
 
 if __name__ == '__main__':
+    logging.config.fileConfig('log.conf')
+
     parser = argparse.ArgumentParser(description='Query information.')
     subparsers = parser.add_subparsers()
 

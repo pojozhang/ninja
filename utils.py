@@ -1,10 +1,13 @@
 import json
 import datetime
 import textwrap
+import logging
+
+logger = logging.getLogger()
 
 
 def print_json(data):
-    print(json.dumps(data, indent=4))
+    logger.info(json.dumps(data, indent=4))
 
 
 def build_order_message(strategy, price, side):
