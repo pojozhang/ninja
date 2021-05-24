@@ -1,4 +1,4 @@
-class TradeContext:
+class Context:
 
     def __init__(self, args, trader, listener={}):
         self.args = args

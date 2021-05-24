@@ -4,13 +4,14 @@ import logging
 import logging.config
 import okex
 from strategy.base import run
-from context import TradeContext
+from trade.context import Context
 from utils import print_json
 
 cp = configparser.ConfigParser()
 cp.read("config.ini")
 appConfig = cp
 okexConfig = appConfig['okex']
+okexHeadersConfig = dict(appConfig['okex.headers']) if appConfig.has_section('okex.headers') else {}
 feishuConfig = appConfig['feishu']
 
 
@@ -25,8 +26,8 @@ def init_logger():
 
 
 def build_context(args):
-    trader = okex.Client(okexConfig)
-    return TradeContext(args=args, trader=trader)
+    trader = okex.Client(config=okexConfig, headers=okexHeadersConfig)
+    return Context(args=args, trader=trader)
 
 
 if __name__ == '__main__':

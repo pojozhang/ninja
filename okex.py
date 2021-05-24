@@ -9,28 +9,28 @@ import requests
 
 
 class Client:
-    def __init__(self, config={}):
+    def __init__(self, config={}, headers={}):
         self.apiKey = config["apiKey"]
         self.apiSecret = config["apiSecret"]
         self.passphrase = config["passphrase"]
         self.rest = config["rest"]
-        self.env = config["env"]
+        self.headers = headers
 
     @sleep_and_retry
     @limits(calls=10, period=1)
-    def instruments(self, inst_type="SWAP"):
+    def get_instruments(self, inst_type="SWAP"):
         data = self.send_request("/api/v5/public/instruments", params={"instType": inst_type})
         return data
 
     @sleep_and_retry
     @limits(calls=10, period=1)
-    def ticker(self, inst_id):
+    def get_ticker(self, inst_id):
         data = self.send_request("/api/v5/market/ticker", params={"instId": inst_id})
         return data[0]
 
     @sleep_and_retry
     @limits(calls=10, period=1)
-    def candles(self, inst_id, before="", after="", bar="15m", limit=""):
+    def get_candles(self, inst_id, before="", after="", bar="15m", limit=""):
         data = self.send_request("/api/v5/market/candles",
                                  params={"instId": inst_id, "before": before,
                                          "after": after, "bar": bar,
@@ -39,9 +39,16 @@ class Client:
 
     @sleep_and_retry
     @limits(calls=10, period=2)
-    def account_balance(self, ccy=''):
+    def get_account_balance(self, ccy=''):
         data = self.send_request("/api/v5/account/balance")
         return data
+
+    @sleep_and_retry
+    @limits(calls=60, period=2)
+    def place_order(self, inst_id, trade_mode, side, position_side, order_type, price, volume):
+        print('place order')
+        # data = self.send_request("/api/v5/trade/order")
+        # return data
 
     @sleep_and_retry
     @limits(calls=10, period=2)
@@ -52,12 +59,11 @@ class Client:
     def send_request(self, path, params={}):
         timestamp = datetime.utcnow().isoformat("T", "milliseconds") + "Z"
         headers = {
-            "x-simulated-trading": "1" if self.env == "sim" else "0",
-            "OK-ACCESS-KEY": self.apiKey,
-            "OK-ACCESS-SIGN": self.sign(timestamp, "GET", path, params, ""),
-            "OK-ACCESS-TIMESTAMP": timestamp,
-            "OK-ACCESS-PASSPHRASE": self.passphrase
-        }
+                      "OK-ACCESS-KEY": self.apiKey,
+                      "OK-ACCESS-SIGN": self.sign(timestamp, "GET", path, params, ""),
+                      "OK-ACCESS-TIMESTAMP": timestamp,
+                      "OK-ACCESS-PASSPHRASE": self.passphrase
+                  } | self.headers
         r = requests.get(self.rest + path, headers=headers, params=params)
         body = json.loads(r.text)
         return body['data']
