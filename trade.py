@@ -3,9 +3,8 @@ import configparser
 import logging
 import logging.config
 import okex
-from strategy.base import run
 from trade.context import Context
-from utils import print_json
+from utils import print_json, parse_args
 
 cp = configparser.ConfigParser()
 cp.read("config.ini")
@@ -13,12 +12,6 @@ appConfig = cp
 okexConfig = appConfig['okex']
 okexHeadersConfig = dict(appConfig['okex.headers']) if appConfig.has_section('okex.headers') else {}
 feishuConfig = appConfig['feishu']
-
-
-def parse_strategy_args(kv):
-    if kv.startswith('--'):
-        kv = kv[2:]
-    return kv
 
 
 def init_logger():
@@ -37,13 +30,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Start trading.')
     parser.add_argument('--strategy', dest='strategy', type=str, nargs='?', default='rsi',
                         help='choose a strategy to trade')
-    args, unknown = parser.parse_known_args()
+    predefined_args, unknown_args = parser.parse_known_args()
 
-    strategy_args = {parse_strategy_args(k): v for k, v in zip(unknown[::2], unknown[1::2])}
-    logger.info(f'Run [{args.strategy}] strategy with args:')
-    print_json(strategy_args)
+    args = {parse_args(k): v for k, v in zip(unknown_args[::2], unknown_args[1::2])}
+    logger.info(f'Run [{predefined_args.strategy}] strategy with args:')
+    print_json(args)
 
-    strategy = __import__(f'strategy.{args.strategy}', fromlist=True)
-    context = build_context(strategy_args)
+    strategy = __import__(f'strategy.{predefined_args.strategy}', fromlist=True)
+    context = build_context(args)
     instance = getattr(strategy, 'create')(context)
-    run(instance)
+    instance.run()

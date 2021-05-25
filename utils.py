@@ -10,6 +10,12 @@ def print_json(data):
     logger.info(json.dumps(data, indent=4))
 
 
+def parse_args(kv):
+    if kv.startswith('--'):
+        kv = kv[2:]
+    return kv
+
+
 def build_order_message(strategy, price, side):
     return textwrap.dedent(f"""\
     交易策略：{strategy}
