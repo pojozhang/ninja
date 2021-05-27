@@ -1,8 +1,7 @@
 import argparse
 import configparser
-import logging
 import logging.config
-import okex
+from exchange import okex
 from trade.context import Context
 from utils import print_json, parse_args
 

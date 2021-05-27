@@ -7,7 +7,7 @@ import csv
 import numpy as np
 import logging.config
 
-import okex
+from exchange import okex
 
 cp = configparser.ConfigParser()
 cp.read("config.ini")
