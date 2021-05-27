@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from hashlib import sha256
 from ratelimit import limits, sleep_and_retry
+from exchange.model import Candle
 
 import requests
 
@@ -35,7 +36,8 @@ class Client:
                                  params={"instId": inst_id, "before": before,
                                          "after": after, "bar": bar,
                                          "limit": limit})
-        return data
+        return list(map(lambda x: Candle(timestamp=int(x[0]), open=float(x[1]), high=float(x[2]), low=float(x[3]),
+                                         close=float(x[4]), volume=float(x[5])), data))
 
     @sleep_and_retry
     @limits(calls=10, period=2)
