@@ -8,7 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdate
 import maya
-import okex
+from exchange import okex
+
 
 def print_hi(name):
     okex.g()
