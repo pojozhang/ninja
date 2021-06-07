@@ -7,7 +7,9 @@ from backtrader.dataseries import TimeFrame
 import pandas as pd
 from backtest.context import Context
 from backtest.proxy import Proxy
+from backtest.data import CSVData
 from utils import print_json, parse_args
+from datetime import datetime
 
 cp = configparser.ConfigParser()
 cp.read("config.ini")
@@ -18,6 +20,10 @@ logging.config.fileConfig('log.conf')
 logger = logging.getLogger(__name__)
 
 
+def dateparse(x):
+    return datetime.utcfromtimestamp(int(x) / 1000).strftime('%Y-%m-%d %H:%M:%S')
+
+
 def build_context(args):
     return Context(args=args, trader=None)
 
@@ -25,6 +31,8 @@ def build_context(args):
 if __name__ == '__main__':
     commonParser = argparse.ArgumentParser(add_help=False)
     commonParser.add_argument('--csv', type=str, help='read csv file')
+    commonParser.add_argument('--reverse', action=argparse.BooleanOptionalAction, default=False,
+                              help='reverse csv data')
     commonParser.add_argument('--csv-delimiter', default=',', type=str, help='csv delimiter', dest='csvDelimiter')
 
     strategyParser = argparse.ArgumentParser(description='Start back test.', parents=[commonParser])
@@ -41,14 +49,27 @@ if __name__ == '__main__':
     context = build_context(strategy_args)
     instance = getattr(strategy, 'create')(context)
 
-    dataframe = pd.read_csv(args.csv, sep=args.csvDelimiter)
-
-    cerebro = bt.Cerebro()
+    cerebro = bt.Cerebro(stdstats=False)
     cerebro.addstrategy(Proxy, args={
         'strategy': instance
     })
-    cerebro.adddata(bt.feeds.PandasData(dataname=dataframe, timeframe=TimeFrame.Minutes, compression=5))
+    datapath = (args.csv)
+
+    dataframe = pd.read_csv(
+        args.csv,
+        parse_dates=True,
+        date_parser=dateparse,
+        index_col='datetime',
+    )
+
+    if args.reverse:
+        dataframe[:] = dataframe[::-1]
+
+    data = CSVData(dataname=dataframe,
+                   nocase=True,
+                   timeframe=TimeFrame.Minutes)
+    cerebro.adddata(data)
     cerebro.broker.setcash(100)
     logger.info(cerebro.broker.getvalue())
-    cerebro.run()
+    result = cerebro.run()
     logger.info(cerebro.broker.getvalue())

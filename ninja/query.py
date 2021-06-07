@@ -53,7 +53,7 @@ def write_csv(args, data):
         writer.writerows(array)
 
 
-def format_data(data, i, formats):
+def format_data(data, i, formats={}):
     formats = {int(k): v for k, v in formats.items()}
     if i in formats:
         for j, _ in enumerate(data):
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     commonParser.add_argument('--csv', type=str, help='csv file')
     commonParser.add_argument('--csv-row', type=str, help='csv row', dest='csvRow')
     commonParser.add_argument('--csv-row-format', nargs='+', action=KVAction, help='csv row format',
-                              dest='csvRowFormat')
+                              dest='csvRowFormat', default={})
     commonParser.add_argument('--csv-header', type=str, help='csv header', dest='csvHeader')
     commonParser.add_argument('--csv-delimiter', type=str, default=',', help='csv delimiter', dest='csvDelimiter')
 
