@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def dateparse(x):
-    return datetime.utcfromtimestamp(int(x) / 1000).strftime('%Y-%m-%d %H:%M:%S')
+    return datetime.fromtimestamp(int(x) / 1000).strftime('%Y-%m-%d %H:%M:%S')
 
 
 def build_context(args):
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     )
 
     if args.reverse:
-        dataframe[:] = dataframe[::-1]
+        dataframe = dataframe.iloc[::-1]
 
     data = CSVData(dataname=dataframe,
                    nocase=True,
