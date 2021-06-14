@@ -97,6 +97,7 @@ if __name__ == '__main__':
                                        '1D', '1W', '1M', '3M', '6M', '1Y'])
     candleParser.add_argument('--inst', type=str, dest='instId')
     candleParser.add_argument('--limit', type=int, default=100)
+    candleParser.add_argument('--indicators', nargs='+', dest='indicators')
     candleParser.set_defaults(func=query_candles)
 
     args, _ = queryParser.parse_known_args()
