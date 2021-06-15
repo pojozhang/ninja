@@ -36,3 +36,13 @@ class KVAction(argparse.Action):
                 raise argparse.ArgumentError(self, f"could not parse argument \"{kv}\" as k=v format")
             d[k] = v
         setattr(args, self.dest, d)
+
+
+class SubArgsAction(argparse.Action):
+
+    def __call__(self, parser, args, values, option_string=None):
+        list = getattr(args, self.dest) or []
+        d = {'value': values[0]}
+        d.update({values[i]: values[i + 1] for i in range(1, len(values), 2)})
+        list.append(d)
+        setattr(args, self.dest, list)

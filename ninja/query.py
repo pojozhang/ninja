@@ -5,8 +5,9 @@ import json
 from jsonpath import jsonpath
 import csv
 import numpy as np
+import pandas as pd
 import logging.config
-from utils import KVAction
+from utils import KVAction, SubArgsAction
 
 from exchange import okex
 
@@ -31,6 +32,9 @@ def query_candles(args):
     while len(candles) > 0 and len(list) < args.limit:
         candles = client.get_candles(inst_id=args.instId, bar=args.bar, after=candles[0].timestamp)
         list.extend(candles)
+    if args.indicators:
+        df = pd.DataFrame([vars(c) for c in list])
+
     return list
 
 
@@ -97,7 +101,7 @@ if __name__ == '__main__':
                                        '1D', '1W', '1M', '3M', '6M', '1Y'])
     candleParser.add_argument('--inst', type=str, dest='instId')
     candleParser.add_argument('--limit', type=int, default=100)
-    candleParser.add_argument('--indicators', nargs='+', dest='indicators')
+    candleParser.add_argument('--indicator', nargs='*', action=SubArgsAction, dest='indicators')
     candleParser.set_defaults(func=query_candles)
 
     args, _ = queryParser.parse_known_args()
