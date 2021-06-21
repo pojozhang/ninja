@@ -1,4 +1,3 @@
-import nestargs
 import configparser
 import csv
 import json
@@ -8,7 +7,7 @@ import nestargs
 import numpy as np
 import pandas as pd
 import yaml
-from dpath.util import get as dictget
+from dpath.util import get as pget
 from jsonpath import jsonpath
 
 from exchange import okex
@@ -59,7 +58,7 @@ def write_csv(args, data):
 
         if args['csv']['header'] is not None:
             array = np.vstack((np.array(args['csv']['header']), array))
-        writer = csv.writer(file, delimiter=dictget(args, 'csv.delimiter', separator='.', default=','))
+        writer = csv.writer(file, delimiter=pget(args, 'csv.delimiter', separator='.', default=','))
         writer.writerows(array)
 
 

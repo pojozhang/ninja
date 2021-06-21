@@ -1,0 +1,26 @@
+api: candles
+args:
+  inst: ETH-USDT-SWAP
+  bar: 15m
+  limit: 1000
+  indicators:
+    - name: ma
+      period: 30
+      type: 3
+    - name: rsi
+      period: 30
+      type: 3
+csv:
+  file: test.csv
+  header:
+    - datetime
+    - open
+    - high
+    - low
+    - close
+  row:
+    - $..timestamp
+    - $..open
+    - $..high
+    - $..low
+    - $..close
