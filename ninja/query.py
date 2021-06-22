@@ -11,7 +11,7 @@ from dpath.util import get as pget
 from jsonpath import jsonpath
 
 from exchange import okex
-from utils import SubArgsAction, StrListAction
+from utils import SubArgsAction, StrListAction, to_dict
 
 cp = configparser.ConfigParser()
 cp.read("config.ini")
@@ -47,7 +47,7 @@ def query_candles(args):
 def write_csv(args, data):
     with open(args['csv']['file'], 'w') as file:
         expressions = args['csv']['row']
-        jsonobj = json.loads(json.dumps(data, default=vars))
+        jsonobj = to_dict(data)
         array = None
         for i, expression in enumerate(expressions):
             if array is None:
@@ -129,7 +129,7 @@ if __name__ == '__main__':
         args = read_yaml(args.file)
         data = get_func(args['api'])(args['args'])
     else:
-        kvargs = json.loads(json.dumps(args, default=vars))
+        kvargs = to_dict(args)
         data = args.func(kvargs)
         args = kvargs
 

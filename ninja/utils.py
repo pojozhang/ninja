@@ -17,6 +17,10 @@ def parse_args(kv):
     return kv
 
 
+def to_dict(obj):
+    return json.loads(json.dumps(obj, default=vars))
+
+
 def build_order_message(strategy, price, side):
     return textwrap.dedent(f"""\
     交易策略：{strategy}
@@ -37,10 +41,12 @@ class KVAction(argparse.Action):
             d[k] = v
         setattr(args, self.dest, d)
 
+
 class StrListAction(argparse.Action):
 
     def __call__(self, parser, args, values, option_string=None):
         setattr(args, self.dest, values.split(",", -1))
+
 
 class SubArgsAction(argparse.Action):
 
