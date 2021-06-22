@@ -15,4 +15,4 @@ class Proxy(bt.Strategy):
     def next(self):
         candle = Candle(open=self.open[0], close=self.close[0], high=self.high[0], low=self.low[0],
                         volume=0, timestamp=self.data.num2date())
-        self.strategy.next(candle)
+        self.strategy.trigger(candle)

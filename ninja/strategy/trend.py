@@ -21,12 +21,11 @@ class Trend(Strategy):
         self.goto(self.on_watch)
 
     def run(self):
-        while self.context.active:
-            candles = self.context.get_candles(inst_id=self.instId, limit=1)
-            if len(candles) == 0:
-                continue
-            logger.info(candles[0])
-            self.next(candles[0])
+        candles = self.context.get_candles(inst_id=self.instId, limit=1)
+        if len(candles) == 0:
+            return
+        logger.info(candles[0])
+        self.trigger(candles[0])
 
     def on_watch(self, data):
         open = float(data[1])

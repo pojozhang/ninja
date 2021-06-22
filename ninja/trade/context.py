@@ -1,6 +1,7 @@
 class Context:
 
-    def __init__(self, args, trader, listener={}):
+    def __init__(self, cron, args, trader, listener={}):
+        self.cron = cron
         self.args = args
         self.trader = trader
         self.listener = listener
